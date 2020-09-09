@@ -1,3 +1,3 @@
 # AICT Internship
 
-I will study **3D object detection** and will mainly use **YOLOv3**.
+I will study **3D object detection** and will mainly use **YOLOv5**.
