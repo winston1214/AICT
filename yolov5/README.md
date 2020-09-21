@@ -54,6 +54,7 @@ If you want to designate the number of classes as something other than 80, you n
 
 
 - Set directory Path
+<img src = https://user-images.githubusercontent.com/47775179/93779003-71d47e00-fc61-11ea-8af4-6a23595f9f25.PNG>
 
 
 
