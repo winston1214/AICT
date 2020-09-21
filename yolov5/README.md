@@ -5,13 +5,13 @@ Ref https://github.com/ultralytics/yolov5
 
 ## Outline
 - Environment
-Ubuntu 18.04.5 , TitanXP
+Ubuntu 18.04.5 , GPU : TitanXP , Creating a virtual environment
 - Training
 I divide the class into two classes and train them using the COCO dataset. (0: Person :boy: , 1: Car :car:)
 - Test
 The test was conducted with Kitty dataset. (img)
 
-1. COCO convert to YOLO
+## 1. COCO convert to YOLO
 :point_right: https://bitbucket.org/yymoto/coco-to-yolo/src/master/
 
 ```bash
@@ -19,7 +19,17 @@ $ java -jar cocotoyolo.jar "coco/annotations/instances_train2017.json" "/usr/hom
 ```
 = java -jar cocotoyolo.jar "json file(annotations) path" "img path" "class" "save path"
 
-2. Setting directory
+## 2. Setting Enviornment
+- Set yolov5
+
+```bash
+$ git clone https://github.com/ultralytics/yolov5.git
+
+$ cd yolov5
+
+$ pip install requirements.txt
+
+```
 
 - Modify yaml file
 
@@ -48,23 +58,71 @@ names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 't
 If you want to designate the number of classes as something other than 80, you need to modify it accordingly.
 
 **nc** : Number of classes
+
 **train** : Path of train images
+
 **val** : Path of validation images
+
 **names** : Set of class names
+
+All_images.txt will be created if you have completed the previous process.
+
+You should separate train.txt and validation.txt from this file to create two txt files.
+
+And you can put that txt file in train_path(or validation_path).
 
 
 - Set directory Path
 <img src = https://user-images.githubusercontent.com/47775179/93779003-71d47e00-fc61-11ea-8af4-6a23595f9f25.PNG>
 
+Set up a directory as shown in the picture above.
 
+## 3. Training
 
+***Basic ver***
 ```bash
 $ python train.py --data coco.yaml --cfg yolov5s.yaml --weights '' --batch-size 64
                                          yolov5m                                40
                                          yolov5l                                24
                                          yolov5x                                16
 ```
-<img src="https://user-images.githubusercontent.com/26833433/90222759-949d8800-ddc1-11ea-9fa1-1c97eed2b963.png" width="900">
+I carried out as follows
+
+```bash
+$ python3 train.py --data ./data/coco.yaml --cfg ./models/yolov5s.yaml --weights yolov5s.pt --batch 64 --img 400 --epochs 50 --name ep50
+```
+
+**data** : Path of data.yaml
+
+**weights** : Path of pretrained file path (default='')
+
+**batch** : batch_size
+
+**cfg** : Path of yolov5 architecture (4 type of version)
+        s : small , m: medium , l : large , x: xlarge
+        
+**names** : Last save name
+
+[yolov5 ver]<img src=https://user-images.githubusercontent.com/26833433/90187293-6773ba00-dd6e-11ea-8f90-cd94afc0427f.png>
+
+
+# 4. Test
+
+```bash
+$ python3 detect.py --source ~/test_img/2011_09_26_drive_0091_sync/image_01/data/ --weights ./runs/exp5_ep50/weights/my_best.pt
+```
+
+**source** : Path of Test images
+
+**weights** : Path of weights file
+
+
+I was converted png to mp4
+
+
+[Test img]<iframe src="https://youtu.be/zzaC7ID1fD4" frameborder="0" encrypted-media" allowfullscreen></iframe> 
+
+
 
 
 
