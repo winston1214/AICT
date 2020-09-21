@@ -118,11 +118,15 @@ $ python3 detect.py --source ~/test_img/2011_09_26_drive_0091_sync/image_01/data
 
 
 I was converted png to mp4
+:point_down: :point_down: **Click there! You can see test video**
+
 
 
 <center><a href="http://www.youtube.com/watch?feature=player_embedded&v=zzaC7ID1fD4
 " target="_blank"><img src="http://img.youtube.com/vi/zzaC7ID1fD4/0.jpg" 
 alt="Test img" /></a></center>
+
+:point_up: :point_up: **Click there! You can see test video**
 
 
 
