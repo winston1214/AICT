@@ -15,7 +15,7 @@ The test was conducted with Kitty dataset. (img)
 :point_right: https://bitbucket.org/yymoto/coco-to-yolo/src/master/
 
 ```bash
-$ java -jar cocotoyolo.jar "coco/annotations/instances_train2017.json" "/usr/home/madmax/coco/images/train2017/" "person, car" "coco/yolo"
+$ java -jar cocotoyolo.jar "coco/annotations/instances_train2017.json" "/usr/home/cvai-server/coco/images/train2017/" "person, car" "coco/yolo"
 ```
 = java -jar cocotoyolo.jar "json file(annotations) path" "img path" "class" "save path"
 
