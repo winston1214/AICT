@@ -1,6 +1,11 @@
 
 # YOLOv5
 
+한국어 버전의 설명 : https://bigdata-analyst.tistory.com/194 -- yolov5 소개
+                   : https://bigdata-analyst.tistory.com/195 -- yolov5 train & test                   
+
+                
+
 Ref https://github.com/ultralytics/yolov5
 
 ## Outline
