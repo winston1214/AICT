@@ -1,7 +1,13 @@
 
 # YOLOv5
 
-Ref https://github.com/ultralytics/yolov5
+한국어 버전의 설명 : https://bigdata-analyst.tistory.com/194  #  yolov5 소개
+
+한국어 버전(더욱 상세함): https://bigdata-analyst.tistory.com/195 -- yolov5 train & test                   
+
+                
+
+Original https://github.com/ultralytics/yolov5
 
 ## Outline
 - Environment
@@ -15,7 +21,7 @@ The test was conducted with Kitty dataset. (img)
 :point_right: https://bitbucket.org/yymoto/coco-to-yolo/src/master/
 
 ```bash
-$ java -jar cocotoyolo.jar "coco/annotations/instances_train2017.json" "/usr/home/madmax/coco/images/train2017/" "person, car" "coco/yolo"
+$ java -jar cocotoyolo.jar "coco/annotations/instances_train2017.json" "/usr/home/cvai-server/coco/images/train2017/" "person, car" "coco/yolo"
 ```
 = java -jar cocotoyolo.jar "json file(annotations) path" "img path" "class" "save path"
 
