@@ -135,6 +135,7 @@ alt="Test img" /></a></center>
 :point_up: :point_up: **Click there! You can see test video**
 
 
-Link : https://youtu.be/zzaC7ID1fD4
+Yolov5 Test avi Link : https://youtu.be/zzaC7ID1fD4
+
 
 
