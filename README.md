@@ -1,3 +1,5 @@
 # AICT Internship
 
-I will study **3D object detection** and will mainly use **YOLOv5**.
+## Research on the commercialization of self-driving trams
+- Real-time object detection using **YOLOv5 algorithm**
+- Prediction of Pedestrian Behavior Using **Optical Flow**
