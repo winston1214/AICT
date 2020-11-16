@@ -31,7 +31,7 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 2. ```$ cd catkin_ws/```
 
-3.```$ catkin_make```
+3. ```$ catkin_make```
 
 ※ if camke error occur, you excute ```unlink /home/parkjiil/catkin_ws/CMakeLists.txt``` // Resolve Link Disengagement to Prevent Crash with Cmake
 
