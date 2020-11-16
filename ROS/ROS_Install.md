@@ -29,7 +29,7 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 1. ```$ mkdir -p catkin_ws/src```
 
-2. ```$ cd catkin_ws/
+2. ```$ cd catkin_ws/```
 
 3.```$ catkin_make```
 
@@ -39,6 +39,8 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 -  ```$ roscore```<a href = 'http://wiki.ros.org/roscore'>roscore description</a>
 
-- ```rqt``` <a href = 'http://wiki.ros.org/rqt'>rqt description</a>
+- ```$ rqt``` <a href = 'http://wiki.ros.org/rqt'>rqt description</a>
 
-- ```rviz``` <a href = 'http://wiki.ros.org/rviz'>rviz description</a>
+- ```$ rviz``` <a href = 'http://wiki.ros.org/rviz'>rviz description</a>
+
+※ If you run the rviz or rqt, you must run the roscore first.
