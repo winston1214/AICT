@@ -1,3 +1,3 @@
 # Tire Health Monitoring
 
-### atent application
+### Patent application
