@@ -19,3 +19,9 @@
 - Lidar : ibeo_lux4
 
 - Camera : acA2000-165uc (ace BASLER)
+
+
+
+### ⛔Warning⛔
+
+**Personal tidings ➡ It may not fit your environment**
