@@ -25,6 +25,8 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 6. ```$ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential``` //Install Ros package building tool
 
+7. ```$ rosdep update```
+
 # Workspace Init
 
 1. ```$ mkdir -p catkin_ws/src```
