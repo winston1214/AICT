@@ -16,7 +16,7 @@ $ sudo apt install build-essential cmake git pkg-config libgtk-3-dev libavcodec-
 
 ```$ mkdir ~/opencv && cd ~/opencv```
 
-```$ https://github.com/opencv/opencv.git ```
+```$ git clone https://github.com/opencv/opencv.git ```
 
 ```$ git clone https://github.com/opencv/opencv_contrib.git```
 
