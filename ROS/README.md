@@ -20,6 +20,8 @@
 
 - Camera : acA2000-165uc (ace BASLER)
 
+- Computer : NUVO
+
 
 
 ### ⛔Warning⛔
