@@ -43,4 +43,10 @@
     - Vehicle Status Information :  /parsed_tx/host_vehicle_state_2805 [ibeo_msgs/HostVehicleState2805]
 
 
+## Excute Camera Node
 
+- ```$sudo gedit /home/catkin_ws/src/pylon_camera/config/default.yaml```
+
+<img src='https://user-images.githubusercontent.com/47775179/100971564-8941b880-357a-11eb-8801-a8770b097633.png'></img>
+
+- Excute Node ```$roslaunch tram camera_nodes_start.launch```
