@@ -29,3 +29,13 @@ $ catkin config --install
 ```
 $ mkdir src && cd src
 ```
+```
+$ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
+```
+```
+$ cd ..
+$ catkin_make
+```
+```
+$ source install/setup.bas --extend
+```
