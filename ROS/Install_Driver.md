@@ -42,7 +42,8 @@
 
 - <a href='http://wiki.ros.org/pylon_camera'>wiki</a>
 
-- First, <a href=' https://www.baslerweb.com/de/support/downloads/downloads-software/'>sdk download </a>
+- First, <a href='https://www.baslerweb.com/de/support/downloads/downloads-software/'>sdk download </a>
+  - pylon 5.2.0 Camera Software Suite Linux x86(64 Bit) - Debian Installer Package
 
 - Install SDK
 
