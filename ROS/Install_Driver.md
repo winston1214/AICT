@@ -59,7 +59,7 @@
 
 - Package Clone & build
 
-```$  d ~/catkin_ws/src/ && git clone https://github.com/magazino/pylon_camera.git && git clone https://github.com/magazino/camera_control_msgs.git```
+```$  cd ~/catkin_ws/src/ && git clone https://github.com/magazino/pylon_camera.git && git clone https://github.com/magazino/camera_control_msgs.git```
 
 ```$ rosdep install --from-paths . --ignore-src —rosdistro=$ROS_DISTRO -y```
 
