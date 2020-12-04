@@ -37,5 +37,5 @@ $ cd ..
 $ catkin_make
 ```
 ```
-$ source install/setup.bas --extend
+$ source install/setup.bash --extend
 ```
