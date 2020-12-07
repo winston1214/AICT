@@ -41,4 +41,4 @@ $ source install/setup.bash --extend
 ```
 
 
-※ if you use ```catkin_make```, click <a href=''>this</a>
+※If the error still occurs, click <a href='https://github.com/winston1214/AICT/blob/master/ROS/python3%20cv_bridge.md'>this</a>
