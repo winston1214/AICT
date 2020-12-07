@@ -34,12 +34,11 @@ $ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
 ```
 ```
 $ cd ..
-$ catkin_make
+$ catkin build cv_bridge
 ```
 ```
 $ source install/setup.bash --extend
 ```
 
 
-#### ref
-<a href='https://github.com/pulver22/gym-gazebo/wiki/ERROR:-Cv_bridge-for-Python3'>cv_bridge error</a>
+※ if you use ```catkin_make```, click <a href=''>this</a>
