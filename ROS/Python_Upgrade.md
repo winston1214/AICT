@@ -39,3 +39,7 @@ $ catkin_make
 ```
 $ source install/setup.bash --extend
 ```
+
+
+#### ref
+<a href='https://github.com/pulver22/gym-gazebo/wiki/ERROR:-Cv_bridge-for-Python3'>cv_bridge error</a>
