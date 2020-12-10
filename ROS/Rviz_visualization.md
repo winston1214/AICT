@@ -24,7 +24,7 @@ If you want to do it indefinitely,
 
 else
 
-2. ```rospaly bagFilepath```
+2. ```rosbag paly bagFilepath```
 
 -- Open New terminal --
 
