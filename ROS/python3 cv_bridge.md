@@ -40,6 +40,11 @@ $ apt-cache show ros-melodic-cv-bridge | grep Version
 ```
 output example : Version: **1.12.8**-0xenial-20180416-143935-0800
 
+```
+cd src/vision_opencv/
+git checkout 1.12.8
+cd ../../
+```
 - catkin build
 ```
 $ catkin build cv_bridge
