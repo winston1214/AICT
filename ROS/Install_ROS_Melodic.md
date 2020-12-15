@@ -19,13 +19,15 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 3. ```$ sudo rosdep init```
 
-4. ```$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc```
+4. ```$ rosdep update```
 
-5. ```$ source ~/.bashrc```
+5. ```$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc```
 
-6. ```$ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential``` //Install Ros package building tool
+6. ```$ source ~/.bashrc```
 
-7. ```$ rosdep update```
+7. ```$ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential``` //Install Ros package building tool
+
+
 
 # Workspace Init
 
@@ -46,5 +48,12 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 - ```$ rviz``` <a href = 'http://wiki.ros.org/rviz'>rviz description</a>
 
 ※ If you occur ```IOError: [Errno 13] Permission denied: '/home/cvai-2070/.ros/roscore-11311.pid'``` error, you run ```sudo chmod 777 -R ~/.ros/```
+
+※ If you occur 
+```
+roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+```
+you do ```killall -9 roscore``` and also ```killall -9 rosmaster```
 
 ※ If you run the rviz or rqt, you must run the roscore first.
