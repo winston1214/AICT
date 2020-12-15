@@ -45,4 +45,6 @@ Jetson AGX Xavier(Ubuntu 18.04.5)
 
 - ```$ rviz``` <a href = 'http://wiki.ros.org/rviz'>rviz description</a>
 
+※ If you occur ```IOError: [Errno 13] Permission denied: '/home/cvai-2070/.ros/roscore-11311.pid'``` error, you run ```sudo chmod 777 -R ~/.ros/```
+
 ※ If you run the rviz or rqt, you must run the roscore first.
