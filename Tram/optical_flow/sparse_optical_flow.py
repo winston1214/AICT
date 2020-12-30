@@ -23,12 +23,17 @@ def optical_flow(x,before,img):
             
         p1,st,err = cv2.calcOpticalFlowPyrLK(final_frame_gray,final_frame_gray2,p0,None,**lk_params)
         
-        tmp=[]
-        for i, (f2,f1) in enumerate(zip(p1,p0)):
+        angle_array = []
+        mag_array = []
+        for f2,f1 in zip(p1,p0):
             a,b = f2.ravel() 
             c,d = f1.ravel()
-            tmp.append([i,a,b,c,d])
-            cv2.arrowedLine(img,(a,b),(c,d),(0,0,255),2)
-        return tmp
+            # cv2.arrowedLine(img, (a, b), (c, d), (0, 0, 255), 2)
+            angle = np.arctan2(d-b,c-a)*180/np.pi
+            angle_array.append(angle)
+            mag = np.sqrt(np.power(a-c,2)+np.power(b-d,2))
+            mag_array.append(mag)
+        if (len(angle_array) != 0) and (len(mag_array) != 0) :
+            return np.mean(angle_array), np.mean(mag_array)
+
     except:pass
-    
