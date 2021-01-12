@@ -13,9 +13,13 @@ from utils.general import check_img_size, non_max_suppression, apply_classifier,
     strip_optimizer, set_logging, increment_path
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
-from optical_flow import optical_flow,dense_optical_flow,gaussian
+from optical_flow import optical_flow,dense_optical_flow
 input_data= []
 img_ls = []
+
+vector_qx = [] #백터 저장을 위한 queue _hyeonuk
+vector_qy = []
+
 def detect(save_img=False):
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
@@ -90,6 +94,9 @@ def detect(save_img=False):
             else:
                 p, s, im0 = Path(path), '', im0s
             im0 = cv2.resize(im0, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+
+            # im0 = cv2.GaussianBlur(im0,(9, 9), 0) #Gaussian filter(9 by 9), 0 means sigma is auto-determined _hyeonuk
+
             img_ls.append(im0)
             idx+=1
             save_path = str(save_dir / p.name)
@@ -121,26 +128,69 @@ def detect(save_img=False):
                         label = '%s' % (names[int(cls)])
                         input_data.append([int((x1+x2)//2),int((y1+y2)//2)])
 
-                        if len(img_ls)>=10:
-                            before=gaussian(img_ls[-10])
-                            cur=gaussian(img_ls[-1])
 
-                            ang,mag = dense_optical_flow(xyxy,before,cur)
-                            print(ang, mag)
+
+                        if len(img_ls)>=2: #changed 10 to 2 _hyeonuk
+                            before=img_ls[-2]
+                            cur=img_ls[-1]
+
+                            mo_x, mo_y = dense_optical_flow(xyxy, before, cur)
+
+                            # print(mo_x, mo_y)
+
+                            # 대표 백터 accumulating, size 10 queue by x, y_hyeonuk
+                            # motion vector의 y성분이 양수인 경우 음수로 변경 _ problem, 만약 앞으로 가는 사람은 어떻게 인지할 것인
+                            if mo_y > 0:
+                                mo_y = -mo_y
+
+                            if len(vector_qx) > 5:
+                                vector_qx.pop(0)
+                                vector_qy.pop(0)
+                                vector_qx.append(mo_x)
+                                vector_qy.append(mo_y)
+                                x_sum = sum(vector_qx)
+                                y_sum = sum(vector_qy)
+                                x_mean = x_sum # / len(vector_qx)
+                                y_mean = y_sum # / len(vector_qy)
+                            else:
+                                vector_qx.append(mo_x)
+                                vector_qy.append(mo_y)
+                                x_sum = sum(vector_qx)
+                                y_sum = sum(vector_qy)
+                                x_mean = x_sum # / len(vector_qx)
+                                y_mean = y_sum # / len(vector_qy)
+
+
+                            # print('%.2f' % x_mean, '%.2f' % y_mean)
+
+                            #대표백터 magnitude angle로 변경 _hyeonuk
+                            mag = np.sqrt((math.pow(x_mean,2))+(math.pow(y_mean,2))) # 수정 예
+                            ang_posmean = math.atan(y_mean/x_mean)
+
+                            # arctan(-90~90) -> 0~360 변환
+                            if x_mean > 0 and y_mean > 0: # 1사분면
+                                ang = ang_posmean
+                            elif x_mean < 0 and y_mean > 0: # 2사분면
+                                ang = np.pi + ang_posmean
+                            elif x_mean < 0 and y_mean < 0: # 3사분면
+                                ang = np.pi + ang_posmean
+                            else: # 4사분면
+                                ang = 2 * np.pi + ang_posmean
+
                             center_x,center_y = (x1+x2)//2,(y1+y2)//2
                             new_x = center_x + mag * np.cos(ang)
                             new_y = center_y - mag * np.sin(ang)
                             cv2.arrowedLine(im0,(int(center_x),int(center_y)),(int(new_x),int(new_y)),(0,0,255),5)
 
-                        #     try:
-                        #         ang,mag = optical_flow(xyxy,img_ls[-2],img_ls[-1])
-                        #         if ang <0 : ang += 360
-                        #         center_x = (x1+x2)//2
-                        #         center_y = (y1+y2)//2
-                        #         new_x = center_x + mag*np.cos(math.radians(ang))
-                        #         new_y = center_y - mag*np.sin(math.radians(ang))
-                        #         cv2.arrowedLine(im0,(int(center_x),int(center_y)),(int(new_x),int(new_y)),(0,0,255),7)
-                        #     except:pass
+                            # try:
+                            #     ang,mag = optical_flow(xyxy,img_ls[-2],img_ls[-1])
+                            #     if ang <0 : ang += 360
+                            #     center_x = (x1+x2)//2
+                            #     center_y = (y1+y2)//2
+                            #     new_x = center_x + mag*np.cos(math.radians(ang))
+                            #     new_y = center_y - mag*np.sin(math.radians(ang))
+                            #     cv2.arrowedLine(im0,(int(center_x),int(center_y)),(int(new_x),int(new_y)),(0,0,255),7)
+                            # except:pass
 
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
 
