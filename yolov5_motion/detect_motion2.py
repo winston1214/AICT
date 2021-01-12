@@ -19,7 +19,7 @@ img_ls = []
 
 vector_qx = [] #백터 저장을 위한 queue _hyeonuk
 vector_qy = []
-
+location = 0
 def detect(save_img=False):
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
@@ -127,6 +127,13 @@ def detect(save_img=False):
 
                         label = '%s' % (names[int(cls)])
                         input_data.append([int((x1+x2)//2),int((y1+y2)//2)])
+                        if len(input_data) == 1: # initial location left:-1, middle:0, right:1
+                            if (x2<=im0.shape[1]//2):
+                                location=-1
+                            elif (x1>=im0.shape[1]//2):
+                                location=1
+                            elif (x2 >= im0.shape[1]//2 and x1<=im0.shape[1]//2):
+                                location=0
 
 
 
@@ -140,7 +147,7 @@ def detect(save_img=False):
 
                             # 대표 백터 accumulating, size 10 queue by x, y_hyeonuk
                             # motion vector의 y성분이 양수인 경우 음수로 변경 _ problem, 만약 앞으로 가는 사람은 어떻게 인지할 것인
-                            if mo_y > 0:
+                            if mo_y > 0: # 사람이 온다고 가정
                                 mo_y = -mo_y
 
                             if len(vector_qx) > 5:
@@ -157,8 +164,8 @@ def detect(save_img=False):
                                 vector_qy.append(mo_y)
                                 x_sum = sum(vector_qx)
                                 y_sum = sum(vector_qy)
-                                x_mean = x_sum # / len(vector_qx)
-                                y_mean = y_sum # / len(vector_qy)
+                                x_mean = x_sum #/ len(vector_qx)
+                                y_mean = y_sum #/ len(vector_qy)
 
 
                             # print('%.2f' % x_mean, '%.2f' % y_mean)
@@ -177,9 +184,30 @@ def detect(save_img=False):
                             else: # 4사분면
                                 ang = 2 * np.pi + ang_posmean
 
+                            degree = math.degrees(ang)
+                            if location == -1: # (x2<=im0.shape[1]//2): # left
+                                if (degree>270) and (degree<=315): # magnitude 조건 추가 예정
+                                    cv2.putText(im0, 'Warning!', (130, 100),cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0 , 255), 3)
+                                    degree = 315
+                                else:
+                                    cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0),3)
+                            elif location == 1: # (x1>=im0.shape[1]//2) : # right
+                                if (degree <= 270) and (degree>225):
+                                    cv2.putText(im0, 'Warning!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255),3)
+                                    degree = 225
+
+                                else:
+                                    cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
+                            elif location == 0: # (x2 >= im0.shape[1]//2 and x1<=im0.shape[1]//2): # center
+                                if (np.mean([225,270])<= degree) and degree<= np.mean([270,315]):
+                                    cv2.putText(im0, 'Warning!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255),3)
+                                    degree = 270
+                                else:
+                                    cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
+
                             center_x,center_y = (x1+x2)//2,(y1+y2)//2
-                            new_x = center_x + mag * np.cos(ang)
-                            new_y = center_y - mag * np.sin(ang)
+                            new_x = center_x + mag * np.cos(math.radians(degree))
+                            new_y = center_y - mag * np.sin(math.radians(degree))
                             cv2.arrowedLine(im0,(int(center_x),int(center_y)),(int(new_x),int(new_y)),(0,0,255),5)
 
                             # try:
