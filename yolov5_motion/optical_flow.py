@@ -8,7 +8,7 @@ def optical_flow(x,before,img): # Lucas Kanade
     final_frame_gray = cv2.cvtColor(before,cv2.COLOR_BGR2GRAY)
     
     lk_params = dict( winSize  = (30,30), maxLevel = 100,criteria = ( cv2.TERM_CRITERIA_COUNT |  cv2.TERM_CRITERIA_EPS, 10, 0.05))
-    feature_params = dict( maxCorners = 10000,
+    feature_params = dict( maxCorners = 100,
                        qualityLevel = 0.05,
                        minDistance = 10,
                        blockSize = 7 )
@@ -37,12 +37,6 @@ def optical_flow(x,before,img): # Lucas Kanade
         return mask
     except:pass
 
-    #     angle = np.arctan2(d-b,c-a)*180/np.pi
-    #     angle_array.append(angle)
-    #     mag = np.sqrt(np.power(a-c,2)+np.power(b-d,2))
-    #     mag_array.append(mag)
-    # if (len(angle_array) != 0) and (len(mag_array) != 0) :
-    #     return np.mean(angle_array), np.mean(mag_array)
 
 def dense_optical_flow(x,before,img):
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3])) # start, end
@@ -50,12 +44,28 @@ def dense_optical_flow(x,before,img):
     output = np.zeros_like(before, dtype=np.float64)
 
     prvs = cv2.cvtColor(before,cv2.COLOR_BGR2GRAY)
+    next_ = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     hsv[...,1],output[...,1] = 255,255
     # img = img[c1[1]:c2[1],c1[0]:c2[0]] # ROI만 계산
-    next_ = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+    #grid, find Homography matrix, stabilize _hyeonuk
+    # height, width = img.shape[:2]
+    # step = 64
+    # idx_y, idx_x = np.mgrid[height / 4:3 * height / 4:step, width / 4:3 * width / 4:step].astype(np.int)
+    # indices = np.stack((idx_x, idx_y), axis=-1).reshape(-1, 1, 2)
+    # prevPt = np.float32(indices)
+    #
+    # nextPt, status, err = cv2.calcOpticalFlowPyrLK(prvs, next_, prevPt, None,
+    #                                                criteria=(cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 10, 0.05))
+    # Hmatrix, tmp = cv2.findHomography(prevPt, nextPt, method=cv2.LMEDS)
+    # stab_img = cv2.warpPerspective(prvs, Hmatrix, (width, height))
+
+
     flow = cv2.calcOpticalFlowFarneback(prvs,next_,None,pyr_scale = 0.5,levels=6,winsize=15,iterations=3,poly_n=5, \
-                                        poly_sigma=1.1,flags=cv2.OPTFLOW_FARNEBACK_GAUSSIAN) #velocity, level 3->6, flag 10->Gaussian, poly_sigma 1.2->1.1 _hyeonuk
+                                        poly_sigma=1.1,flags=cv2.OPTFLOW_FARNEBACK_GAUSSIAN)
+    #velocity, level 3->6, flag 10->Gaussian, poly_sigma 1.2->1.1, prv->stab_img _hyeonuk
+
     mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1]) # ang = radian
 
     hsv[...,0] = ang#*180/np.pi/2 # radian type
@@ -88,28 +98,3 @@ def dense_optical_flow(x,before,img):
     y_mean = np.mean(y_ls)
 
     return x_mean, y_mean #return 값을 magnitude, angle이 아닌 x, y형태로 받음. _hyeonuk
-    #
-    # mag_mean = np.sqrt((x_mean**2)+(y_mean**2))
-    # ang_posmean = math.atan(y_mean/x_mean)
-    #
-    # if x_mean > 0 and y_mean > 0:
-    #     ang_mean = ang_posmean
-    # elif x_mean < 0 and y_mean > 0:
-    #     ang_mean = np.pi + ang_posmean
-    # elif x_mean < 0 and y_mean < 0:
-    #     ang_mean = np.pi + ang_posmean
-    # else:
-    #     ang_mean = 2 * np.pi + ang_posmean
-    #
-    # # ang_q1 = np.quantile(angle_ls,0.25) # 하위 25퍼센트 값
-    # # ang_q3 = np.quantile(angle_ls,0.75) # 상위 25퍼센트 값
-    # # angle_range = angle_ls[np.where((angle_ls>=ang_q1) & (angle_ls<=ang_q3))]
-    # # ang_mean = np.mean(angle_range)
-    # # mag_q1 = np.quantile(mag_ls,0.25)
-    # # mag_q3 = np.quantile(mag_ls,0.75)
-    # # mag_range = mag_ls[np.where((mag_ls>=mag_q1) & (mag_ls<=mag_q3))]
-    # # mag_mean = np.mean(mag_range)
-    #
-    # return ang_mean,mag_mean
-
-
