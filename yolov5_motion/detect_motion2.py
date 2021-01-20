@@ -13,13 +13,18 @@ from utils.general import check_img_size, non_max_suppression, apply_classifier,
     strip_optimizer, set_logging, increment_path
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
-from optical_flow import optical_flow,dense_optical_flow
-input_data= []
+from optical_flow import optical_flow, dense_optical_flow
+
+input_data = []
 img_ls = []
 
-vector_qx = [] #백터 저장을 위한 queue _hyeonuk
+vector_qx = []  # 백터 저장을 위한 queue _hyeonuk
 vector_qy = []
+velocity_arr = []
+distance_arr = []
 location = 0
+
+
 def detect(save_img=False):
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
@@ -64,7 +69,7 @@ def detect(save_img=False):
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
     _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
-    num = 0
+    over_object=0
     idx = 0
     for path, img, im0s, vid_cap in dataset:
 
@@ -74,7 +79,7 @@ def detect(save_img=False):
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
-        
+
         # Inference
         t1 = time_synchronized()
         pred = model(img, augment=opt.augment)[0]
@@ -98,7 +103,7 @@ def detect(save_img=False):
             # im0 = cv2.GaussianBlur(im0,(9, 9), 0) #Gaussian filter(9 by 9), 0 means sigma is auto-determined _hyeonuk
 
             img_ls.append(im0)
-            idx+=1
+            idx += 1
             save_path = str(save_dir / p.name)
             txt_path = str(save_dir / 'labels' / p.stem) + ('_%g' % dataset.frame if dataset.mode == 'video' else '')
             s += '%gx%g ' % img.shape[2:]  # print string
@@ -122,32 +127,42 @@ def detect(save_img=False):
 
                     if save_img or view_img:  # Add bbox to image
 
-
                         x1, y1, x2, y2 = int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])
 
                         label = '%s' % (names[int(cls)])
-                        input_data.append([int((x1+x2)//2),int((y1+y2)//2)])
-                        if len(input_data) == 1: # initial location left:-1, middle:0, right:1
-                            if (x2<=im0.shape[1]//2):
-                                location=-1
-                            elif (x1>=im0.shape[1]//2):
-                                location=1
-                            elif (x2 >= im0.shape[1]//2 and x1<=im0.shape[1]//2):
-                                location=0
+                        input_data.append([int((x1 + x2) // 2), int((y1 + y2) // 2)])
+                        distance_mm = (1750 * 18) / ((abs(y1 - y2)) * 0.025)
 
+                        #distance 계산 _hyeonuk
+                        velocity = 0
+                        if y2 >= im0.shape[0] - 2 or over_object > 1:
+                            over_object += 1
+                            distance_mm = (1 - 1 / (over_object + 1)) * (1750 * 18) / (
+                                        (abs(y1 - y2) * (1 + 0.04 * over_object) + abs(x1 - x2)*0.01*over_object) * 0.025) + \
+                                          (1 / (over_object + 1)) * distance_mm
+                        else:
+                            if over_object > 0:
+                                over_object -= 1
 
+                        label = '%s %.2fm' % (names[int(cls)], distance_mm / 1000)
 
-                        if len(img_ls)>=2: #changed 10 to 2 _hyeonuk
-                            before=img_ls[-2]
-                            cur=img_ls[-1]
+                        if len(input_data) == 1:  # initial location left:-1, middle:0, right:1
+                            if (x2 <= im0.shape[1] // 2):
+                                location = -1
+                            elif (x1 >= im0.shape[1] // 2):
+                                location = 1
+                            elif (x2 >= im0.shape[1] // 2 and x1 <= im0.shape[1] // 2):
+                                location = 0
+
+                        if len(img_ls) >= 2:  # changed 10 to 2 _hyeonuk
+                            before = img_ls[-2]
+                            cur = img_ls[-1]
 
                             mo_x, mo_y = dense_optical_flow(xyxy, before, cur)
 
-                            # print(mo_x, mo_y)
-
                             # 대표 백터 accumulating, size 10 queue by x, y_hyeonuk
                             # motion vector의 y성분이 양수인 경우 음수로 변경 _ problem, 만약 앞으로 가는 사람은 어떻게 인지할 것인
-                            if mo_y > 0: # 사람이 온다고 가정
+                            if mo_y > 0:  # 사람이 온다고 가정
                                 mo_y = -mo_y
 
                             if len(vector_qx) > 5:
@@ -157,58 +172,87 @@ def detect(save_img=False):
                                 vector_qy.append(mo_y)
                                 x_sum = sum(vector_qx)
                                 y_sum = sum(vector_qy)
-                                x_mean = x_sum # / len(vector_qx)
-                                y_mean = y_sum # / len(vector_qy)
+                                x_mean = x_sum  # / len(vector_qx)
+                                y_mean = y_sum  # / len(vector_qy)
+
+                                if distance_mm > 1000:
+                                    distance_arr.pop(0)
+                                    distance_arr.append(distance_mm)
+
+                                velocity = distance_arr[-1] - distance_arr[0]
+                                if len(velocity_arr) > 30:
+                                    velocity_arr.pop(0)
+                                velocity_arr.append(velocity)
+
+                                velocity = np.mean(np.array(velocity_arr))
+
                             else:
                                 vector_qx.append(mo_x)
                                 vector_qy.append(mo_y)
                                 x_sum = sum(vector_qx)
                                 y_sum = sum(vector_qy)
-                                x_mean = x_sum #/ len(vector_qx)
-                                y_mean = y_sum #/ len(vector_qy)
+                                x_mean = x_sum  # / len(vector_qx)
+                                y_mean = y_sum  # / len(vector_qy)
 
+                                distance_arr.append(distance_mm)
+                                velocity_arr.append(velocity)
 
+                            velocity=velocity*(vid_cap.get(cv2.CAP_PROP_FPS))/3
                             # print('%.2f' % x_mean, '%.2f' % y_mean)
 
-                            #대표백터 magnitude angle로 변경 _hyeonuk
-                            mag = np.sqrt((math.pow(x_mean,2))+(math.pow(y_mean,2))) # 수정 예
-                            ang_posmean = math.atan(y_mean/x_mean)
+                            # 대표백터 magnitude angle로 변경 _hyeonuk
+                            mag = np.sqrt((math.pow(x_mean, 2)) + (math.pow(y_mean, 2)))  # 수정 예
+                            ang_posmean = math.atan(y_mean / x_mean)
 
                             # arctan(-90~90) -> 0~360 변환
-                            if x_mean > 0 and y_mean > 0: # 1사분면
+                            if x_mean > 0 and y_mean > 0:  # 1사분면
                                 ang = ang_posmean
-                            elif x_mean < 0 and y_mean > 0: # 2사분면
+                            elif x_mean < 0 and y_mean > 0:  # 2사분면
                                 ang = np.pi + ang_posmean
-                            elif x_mean < 0 and y_mean < 0: # 3사분면
+                            elif x_mean < 0 and y_mean < 0:  # 3사분면
                                 ang = np.pi + ang_posmean
-                            else: # 4사분면
+                            else:  # 4사분면
                                 ang = 2 * np.pi + ang_posmean
 
                             degree = math.degrees(ang)
-                            if location == -1: # (x2<=im0.shape[1]//2): # left
-                                if (degree>270) and (degree<=315): # magnitude 조건 추가 예정
-                                    cv2.putText(im0, 'Warning!', (130, 100),cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0 , 255), 3)
+                            if location == -1:  # (x2<=im0.shape[1]//2): # left
+                                if (degree > 270) and (degree <= 315) and (distance_mm / 1000 < 1 ):  # magnitude 조건 추가 예정
+                                    cv2.putText(im0, 'Warning!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255),3)
+                                    cv2.circle(im0, (int(im0.shape[1]/2 - x_mean * 2),int(im0.shape[0] - 30 + y_mean)),
+                                               color=(255,255,0), radius = 10, thickness = -1)
+                                    cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm/velocity), (130, 150), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
                                     degree = 315
                                 else:
-                                    cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0),3)
-                            elif location == 1: # (x1>=im0.shape[1]//2) : # right
-                                if (degree <= 270) and (degree>225):
+                                    cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
+                            elif location == 1:  # (x1>=im0.shape[1]//2) : # right
+                                if (degree <= 270) and (degree > 225)and (distance_mm / 1000 < 1 ):
                                     cv2.putText(im0, 'Warning!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255),3)
+                                    cv2.circle(im0,
+                                               (int(im0.shape[1] / 2 - x_mean * 2), int(im0.shape[0] - 30 + y_mean)),
+                                               color=(255, 255, 0), radius=10, thickness=-1)
+                                    cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm / velocity), (130, 150),
+                                                cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
                                     degree = 225
 
                                 else:
                                     cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
-                            elif location == 0: # (x2 >= im0.shape[1]//2 and x1<=im0.shape[1]//2): # center
-                                if (np.mean([225,270])<= degree) and degree<= np.mean([270,315]):
+                            elif location == 0:  # (x2 >= im0.shape[1]//2 and x1<=im0.shape[1]//2): # center
+                                if (np.mean([225, 270]) <= degree) and degree <= np.mean([270, 315])and (distance_mm / 1000 < 1 ):
                                     cv2.putText(im0, 'Warning!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255),3)
+                                    cv2.circle(im0,
+                                               (int(im0.shape[1] / 2 - x_mean * 2), int(im0.shape[0] - 30 + y_mean)),
+                                               color=(255, 255, 0), radius=10, thickness=-1)
+                                    cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm / velocity), (130, 150),
+                                                cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
                                     degree = 270
                                 else:
                                     cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
 
-                            center_x,center_y = (x1+x2)//2,(y1+y2)//2
+                            center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
                             new_x = center_x + mag * np.cos(math.radians(degree))
                             new_y = center_y - mag * np.sin(math.radians(degree))
-                            cv2.arrowedLine(im0,(int(center_x),int(center_y)),(int(new_x),int(new_y)),(0,0,255),5)
+                            cv2.arrowedLine(im0, (int(center_x), int(center_y)), (int(new_x), int(new_y)), (0, 0, 255),
+                                            5)
 
                             # try:
                             #     ang,mag = optical_flow(xyxy,img_ls[-2],img_ls[-1])
@@ -243,8 +287,6 @@ def detect(save_img=False):
                 #                 cv2.circle(im0,(current[i][0],current[i][1]),5,(0,0,255),-1)
                 # else:num+=int(n)
 
-
-
             # Print time (inference + NMS)
             print('%sDone. (%.3fs)' % (s, t2 - t1))
 
@@ -255,12 +297,12 @@ def detect(save_img=False):
                     raise StopIteration
 
             # Save results (image with detections)
-            
+
             if save_img:
                 if dataset.mode == 'images':
                     # cv2.imwrite(save_path, im0)
-                    cv2.imshow('ros',im0)
-                    
+                    cv2.imshow('ros', im0)
+
                 else:
                     if vid_path != save_path:  # new video
                         vid_path = save_path
@@ -281,7 +323,6 @@ def detect(save_img=False):
 
     print('Done. (%.3fs)' % (time.time() - t0))
 
-        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
