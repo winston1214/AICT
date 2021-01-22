@@ -221,6 +221,10 @@ def detect(save_img=False):
                                     cv2.circle(im0, (int(im0.shape[1]/2 - x_mean * 2),int(im0.shape[0] - 30 + y_mean)),
                                                color=(255,255,0), radius = 10, thickness = -1)
                                     cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm/velocity), (130, 150), cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
+                                    cv2.putText(im0, 'PCP', \
+                                                (int(im0.shape[1] / 2 - x_mean * 2) + 10,
+                                                 int(im0.shape[0] - 30 + y_mean) - 30), \
+                                                cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
                                     degree = 315
                                 else:
                                     cv2.putText(im0, 'Safe!', (130, 100), cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
@@ -232,6 +236,10 @@ def detect(save_img=False):
                                                color=(255, 255, 0), radius=10, thickness=-1)
                                     cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm / velocity), (130, 150),
                                                 cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
+                                    cv2.putText(im0, 'PCP', \
+                                                (int(im0.shape[1] / 2 - x_mean * 2) + 10,
+                                                 int(im0.shape[0] - 30 + y_mean) - 30), \
+                                                cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
                                     degree = 225
 
                                 else:
@@ -242,6 +250,10 @@ def detect(save_img=False):
                                     cv2.circle(im0,
                                                (int(im0.shape[1] / 2 - x_mean * 2), int(im0.shape[0] - 30 + y_mean)),
                                                color=(255, 255, 0), radius=10, thickness=-1)
+                                    cv2.putText(im0, 'PCP', \
+                                                (int(im0.shape[1] / 2 - x_mean * 2) + 10,
+                                                 int(im0.shape[0] - 30 + y_mean) - 30), \
+                                                cv2.FONT_HERSHEY_COMPLEX, 1.0, (255, 0, 0), 3)
                                     cv2.putText(im0, 'TTC : {:.2f}s'.format(-distance_mm / velocity), (130, 150),
                                                 cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 255))
                                     degree = 270
