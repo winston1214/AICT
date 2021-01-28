@@ -57,7 +57,8 @@ $ source install/setup.bash --extend
 ```
 - Make it available to all workspaces
 ```
-echo "source ~/catkin_cvws/install/setup.bash" >> ~/.bashrc
+$ echo "source ~/catkin_cvws/install/setup.bash" >> ~/.bashrc
+$ source ~/.bashrc
 ```
 - Test
 ```
