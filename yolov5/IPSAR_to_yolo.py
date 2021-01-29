@@ -3,8 +3,9 @@ import os
 from xml.etree.ElementTree import parse
 label_path = 'trainImages/labels/'
 label_ls = os.listdir(label_path)
-bbox = []
+
 for label in label_ls:
+    bbox = []
     tree = parse('trainImages/labels/'+label)
     root = tree.getroot()
     ann = root.findall('object')
