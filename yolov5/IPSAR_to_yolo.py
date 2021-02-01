@@ -1,3 +1,31 @@
+'''
+<?xml version="1.0" encoding="utf-8"?>
+<annotation>
+   <object>
+      <name>human</name>
+      <pose>unspecified</pose>
+      <truncated>0</truncated>
+      <difficult>0</difficult>
+      <bndbox>
+         <xmin>3471</xmin>
+         <xmax>3540</xmax>
+         <ymin>1195</ymin>
+         <ymax>1275</ymax>
+      </bndbox>
+   </object>
+   <folder>SAR</folder>
+   <filename>BLA_0001</filename>
+   <source>
+      <database>HERIDAL database</database>
+   </source>
+   <size>
+      <width>4000</width>
+      <height>3000</height>
+      <depth>3</depth>
+   </size>
+</annotation>
+'''
+   
 import numpy as np
 import os
 from xml.etree.ElementTree import parse
