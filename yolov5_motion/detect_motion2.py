@@ -99,10 +99,10 @@ def detect(save_img=False):
             else:
                 p, s, im0 = Path(path), '', im0s
             im0 = cv2.resize(im0, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
-
+            im1 = im0.copy()
             # im0 = cv2.GaussianBlur(im0,(9, 9), 0) #Gaussian filter(9 by 9), 0 means sigma is auto-determined _hyeonuk
 
-            img_ls.append(im0)
+            img_ls.append(im1)
             idx += 1
             save_path = str(save_dir / p.name)
             txt_path = str(save_dir / 'labels' / p.stem) + ('_%g' % dataset.frame if dataset.mode == 'video' else '')
