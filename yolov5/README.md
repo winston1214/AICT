@@ -87,25 +87,24 @@ Set up a directory as shown in the picture above.
 
 ***Basic ver***
 ```bash
-$ python train.py --data coco.yaml --cfg yolov5s.yaml --weights '' --batch-size 64
-                                         yolov5m                                40
-                                         yolov5l                                24
-                                         yolov5x                                16
+$ python train.py --data coco.yaml  --weights yolov5s.pt --batch-size 64
+                                                                      40
+                                                                      24
+                                                                      16
 ```
 I carried out as follows
 
 ```bash
-$ python3 train.py --data ./data/coco.yaml --cfg ./models/yolov5s.yaml --weights yolov5s.pt --batch 64 --img 400 --epochs 50 --name ep50
+$ python3 train.py --data ./data/coco.yaml --weights yolov5s.pt --batch 64 --epochs 50 --name ep50
 ```
 
 **data** : Path of data.yaml
 
-**weights** : Path of pretrained file path (default='')
+**weights** : Path of yolov5 architecture (4 type of version)
+        s : small , m: medium , l : large , x: xlarge
 
 **batch** : batch_size
 
-**cfg** : Path of yolov5 architecture (4 type of version)
-        s : small , m: medium , l : large , x: xlarge
         
 **names** : Last save name
 
